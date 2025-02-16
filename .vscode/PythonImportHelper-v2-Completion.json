@@ -1,0 +1,198 @@
+[
+    {
+        "label": "sqlite3",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sqlite3",
+        "description": "sqlite3",
+        "detail": "sqlite3",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
+        "label": "psutil",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "psutil",
+        "description": "psutil",
+        "detail": "psutil",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "Faker",
+        "importPath": "faker",
+        "description": "faker",
+        "isExtraImport": true,
+        "detail": "faker",
+        "documentation": {}
+    },
+    {
+        "label": "tqdm",
+        "importPath": "tqdm",
+        "description": "tqdm",
+        "isExtraImport": true,
+        "detail": "tqdm",
+        "documentation": {}
+    },
+    {
+        "label": "monitorar_recursos",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def monitorar_recursos():\n    \"\"\"\n    Retorna o uso de memória e CPU do sistema no momento da execução.\n    Returns:\n        memoria (float): Uso de memória em MB.\n        cpu (float): Uso da CPU em %.\n    \"\"\"\n    processo = psutil.Process(os.getpid())\n    memoria = processo.memory_info().rss / (1024 * 1024)  # Memória em MB\n    cpu = psutil.cpu_percent(interval=1)  # Uso de CPU em %",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "medir_tempo",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def medir_tempo(func):\n    \"\"\"\n    Decorador para medir o tempo de execução de uma função e monitorar o consumo de memória e CPU.\n    Args:\n        func (function): Função a ser medida.\n    Returns:\n        function: Retorna a função decorada com monitoramento de tempo e recursos.\n    \"\"\"\n    def wrapper(*args, **kwargs):\n        inicio = time.time()",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "medir_tempo_select",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def medir_tempo_select(func):\n    def wrapper(*args, **kwargs):\n        inicio = time.time()\n        method, contagem_registros, tamanho_bd = func(*args, **kwargs)\n        fim = time.time()\n        tempo_total = fim - inicio\n        memoria, cpu = monitorar_recursos()\n        return method, contagem_registros, tamanho_bd, tempo_total, memoria, cpu\n    return wrapper\ndef registrar_resultados(",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "registrar_resultados",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def registrar_resultados(\n    tempo_processamento: float,\n    memoria: float,\n    cpu: float,\n    nr_registros: int,\n    method: str,\n    commit_type: str,\n    conexao: sqlite3.Connection,\n):\n    \"\"\"",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "contar_registros",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def contar_registros(conexao):\n    cursor = conexao.cursor()\n    cursor.execute(\"SELECT COUNT(*) FROM t_sqlite_insert;\")\n    resultado = cursor.fetchone()\n    print(f\"Total de registros: {resultado[0]}\")\n# genarator numérico\ndef generator_range(nr_range: int, inicio_zero: bool = False):\n    \"\"\"\n    Retorna um generator com o range começando em x + 1\n    Desta forma um range(10) começa em 1 e termina em 10",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "generator_range",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def generator_range(nr_range: int, inicio_zero: bool = False):\n    \"\"\"\n    Retorna um generator com o range começando em x + 1\n    Desta forma um range(10) começa em 1 e termina em 10\n    \"\"\"\n    if inicio_zero:\n        y = 0\n    else:\n        y = 1\n    return (x + y for x in range(nr_range))",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "inserir_dados_execute",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def inserir_dados_execute(conexao, num_registros):\n    cursor = conexao.cursor()\n    cursor.execute(\"BEGIN TRANSACTION;\")\n    for _ in generator_range(num_registros, True):\n        nome = fake.name()\n        valor = random.randint(1, 1000000)\n        cursor.execute(\n            \"INSERT INTO t_sqlite_insert (nome, valor) VALUES (?, ?)\", (nome, valor)\n        )\n    conexao.commit()",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "inserir_dados_execute_many",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def inserir_dados_execute_many(conexao, num_registros):\n    cursor = conexao.cursor()\n    cursor.execute(\"BEGIN TRANSACTION;\")\n    lst_insert_many = list()\n    for _ in generator_range(num_registros, True):\n        nome = fake.name()\n        valor = random.randint(1, 1000000)\n        lst_insert_many.append((nome, valor))\n    cursor.executemany(\n        \"INSERT INTO t_sqlite_insert_many (nome, valor) VALUES (?, ?)\", lst_insert_many",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "tamanho_banco",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def tamanho_banco(nome_banco):\n    \"\"\"\n    Retorna o tamanho do arquivo do banco de dados SQLite.\n    Args:\n        nome_banco (str): Nome do arquivo do banco de dados.\n    Returns:\n        float: Tamanho do banco de dados em MB.\n    \"\"\"\n    tamanho_bytes = os.path.getsize(nome_banco)  # Obtém o tamanho em bytes\n    tamanho_mb = tamanho_bytes / (1024 * 1024)  # Converte para MB",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "contar_registros_t_size",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def contar_registros_t_size(conexao, tabela):\n    \"\"\"\n    Conta o número total de registros em uma tabela específica.\n    Args:\n        conexao (sqlite3.Connection): Conexão ativa com o banco de dados.\n        tabela (str): Nome da tabela a ser consultada.\n    Returns:\n        int: Quantidade total de registros na tabela.\n    \"\"\"\n    cursor = conexao.cursor()",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "inserir_dados_t_size",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def inserir_dados_t_size(conexao, num_registros):\n    cursor = conexao.cursor()\n    cursor.execute(\"BEGIN TRANSACTION;\")\n    for _ in generator_range(num_registros, True):\n        nome = fake.name()\n        valor = random.randint(1, 1000000)\n        cursor.execute(\n            \"INSERT INTO t_sqlite_size (nome, valor) VALUES (?, ?)\", (nome, valor)\n        )\n    conexao.commit()",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "registrar_resultados_t_size",
+        "kind": 2,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "def registrar_resultados_t_size(\n    conexao, resultado_insert: tuple, resultado_select: tuple\n):\n    cursor = conexao.cursor()\n    cursor.execute(\n        f\"INSERT INTO t_sqlite_size_results (method, commit_type, time, memori, cpu) values (?,?,?,?,?)\",\n        resultado_insert,\n    )\n    cursor.execute(\n        f\"INSERT INTO t_sqlite_size_results (method, nr_registros, data_base_size, time, memori, cpu) values (?,?,?,?,?,?)\",",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "fake",
+        "kind": 5,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "fake = Faker(\"pt_br\")\n# %% [markdown]\n# ---\n#\n# ## _INSERT DE DADOS E EFICIÊNCIA_\n#\n# %%\n# Função para monitorar memória e CPU\ndef monitorar_recursos():\n    \"\"\"",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "nome_banco",
+        "kind": 5,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "nome_banco = \"sqlite_database.bd\"\ntest_range = 10\nprint(f\"Banco de dados '{nome_banco}' criado.\")\ntry:\n    conexao = sqlite3.connect(nome_banco)\n    cursor = conexao.cursor()\n    cursor.executescript(\n        \"\"\"\n        CREATE TABLE IF NOT EXISTS t_sqlite_insert (\n            id INTEGER PRIMARY KEY AUTOINCREMENT,",
+        "detail": "insercao_dados",
+        "documentation": {}
+    },
+    {
+        "label": "test_range",
+        "kind": 5,
+        "importPath": "insercao_dados",
+        "description": "insercao_dados",
+        "peekOfCode": "test_range = 10\nprint(f\"Banco de dados '{nome_banco}' criado.\")\ntry:\n    conexao = sqlite3.connect(nome_banco)\n    cursor = conexao.cursor()\n    cursor.executescript(\n        \"\"\"\n        CREATE TABLE IF NOT EXISTS t_sqlite_insert (\n            id INTEGER PRIMARY KEY AUTOINCREMENT,\n            nome TEXT,",
+        "detail": "insercao_dados",
+        "documentation": {}
+    }
+]
